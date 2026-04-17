@@ -1,0 +1,26 @@
+html,
+body {
+    margin: 0;
+    padding: 0;
+}
+
+#stage {
+    height: 100dvh;
+    width: 100dvw;
+    display: block;
+}
+
+.fill {
+    fill: gold;
+    stroke-linejoin: round;
+    stroke: gold;
+    stroke-width: 9;
+    filter: drop-shadow(0 0 5px goldenrod);
+}
+
+.stroke {
+    fill: none;
+    stroke-linejoin: round;
+    stroke: lightgoldenrodyellow;
+    stroke-width: 3;
+}

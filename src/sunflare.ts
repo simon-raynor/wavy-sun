@@ -87,7 +87,7 @@ function createFlare(id: string, size: number, heightmult: number = HEIGHTMULT):
 }
 
 
-const BASEMULT = 2;
+const BASEMULT = 1;
 const MULTSTEP = 1;
 
 
@@ -109,19 +109,24 @@ export default function createSun(id: string, size: number, layers: number = 3):
     for (let layerNo = layers; layerNo > 0; layerNo--) {
         const layerSize = size;
 
+        const layerId = `${id}_layer_${layerNo}`;
         const flareId = `${id}_flare_${layerNo}`;
+
         const flareSize = layerSize * 0.55;
+
         const [flareSymbol, updateFlare] = createFlare(flareId, flareSize, BASEMULT + (MULTSTEP * layerNo));
         updaters.push(t => updateFlare(((t + (layerNo * (WIGGLE_FREQ / layers))) % WIGGLE_FREQ) / WIGGLE_FREQ));
         symbols.append(flareSymbol);
 
         const layer = document.createElementNS('http://www.w3.org/2000/svg', 'symbol');
-        const layerId = `${id}_layer_${layerNo}`;
         layer.setAttribute('id', layerId);
         
         // append <use>s for the flare around a circle centered
         // at `cx`, `cy` with radius `size`
-        for (let j = (layerNo % 2) ? 0 : 15; j < 360; j += 30) {
+        const count = 11 + layerNo;
+        const degreesPer = 360 / count;
+
+        for (let j = 0; j < 360; j += degreesPer) {
             const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
             use.setAttribute('href', `#${flareId}`);
 
