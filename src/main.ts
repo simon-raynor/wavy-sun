@@ -46,6 +46,18 @@ const SECONDS_PER_SPIN = 5;
 
 
 
+function getWiggleRadiiAtT(t: number) {
+    return BASE_RADII.map(
+        (radius, idx) => {
+            if (!idx) {
+                return tween(0, radius, t);
+            } else if (idx === BASE_RADII.length - 1) {
+                return tween(BASE_RADII[idx - 1], 0, t);
+            } else return tween(BASE_RADII[idx - 1], radius, t);
+        }
+    );
+}
+
 function wigglyLine(from: Vec2, to: Vec2, radii: number[], reversed: boolean) {
     const [fx ,fy] = from;
     const [tx, ty] = to;
@@ -107,15 +119,7 @@ function drawLayer(t: number, centre: Vec2, radius: number, flareCount: number, 
         ));
     }
 
-    const wiggleRadii = BASE_RADII.map(
-        (radius, idx) => {
-            if (!idx) {
-                return tween(0, radius, wiggleT);
-            } else if (idx === BASE_RADII.length - 1) {
-                return tween(BASE_RADII[idx - 1], 0, wiggleT);
-            } else return tween(BASE_RADII[idx - 1], radius, wiggleT);
-        }
-    );
+    const wiggleRadii = getWiggleRadiiAtT(wiggleT);
     const wiggleRadRev = wiggleRadii.slice().reverse();
 
     radiusPoints.forEach((point, idx) => {
@@ -130,18 +134,18 @@ function drawLayer(t: number, centre: Vec2, radius: number, flareCount: number, 
 }
 
 function drawSun(t: number, centre: Vec2, radius: number, layers: number = 2) {
-    const baseFlareLength = 1;
+    const baseFlareLength = 1.125;
     const layerRadius = radius / (1 + baseFlareLength);
 
-    const sizeStep = 0.8;
-    const flareStep = 1;
+    const sizeStep = 0.9;
+    const flareStep = 0.95;
 
     for (let i = 0; i < layers; i++) {
         drawLayer(
             t,
             centre,
             layerRadius * Math.pow(sizeStep, i),
-            15 - 2,
+            15 - i,
             baseFlareLength / Math.pow(flareStep, i),
             (i % 2) ? 1 + i : -1 - i
         );
@@ -149,9 +153,9 @@ function drawSun(t: number, centre: Vec2, radius: number, layers: number = 2) {
     }
 
     ctx.beginPath();
-    const circRadius = layerRadius * Math.pow(sizeStep, layers);
-    ctx.moveTo(centre[0] + circRadius, centre[1]);
-    ctx.arc(centre[0], centre[1], circRadius, 0, 2 * Math.PI, false);
+    const outerCoreRadius = layerRadius * Math.pow(sizeStep, layers);
+    ctx.moveTo(centre[0] + outerCoreRadius, centre[1]);
+    ctx.arc(centre[0], centre[1], outerCoreRadius, 0, 2 * Math.PI, false);
     paintCurrentPath();
 }
 
@@ -181,20 +185,34 @@ function paintCurrentPath() {
 }
 
 
-//let t = 0;
-let prev = 0;
 function loop(t: number) {
-    prev = t;
-
+    // wipe for next frame
     ctx.clearRect(0,0,ctx.canvas.width / window.devicePixelRatio,ctx.canvas.height / window.devicePixelRatio);
     
     try {
         drawSun(
             t / 1000,
-            [window.innerWidth / 2, window.innerHeight / 3],
-            Math.min(window.innerWidth, window.innerHeight) / 3,
+            [
+                (window.innerWidth / 10) * Math.sin(t / 5000) + window.innerWidth / 2,
+                (window.innerWidth / 15) * Math.cos(t / 5000) + window.innerHeight / 3
+            ],
+            Math.min(window.innerWidth / 2, 2 * window.innerHeight / 3),
             3
         );
+
+        // example line
+        ctx.beginPath();
+        wigglyLine(
+            [36, window.innerHeight - 40],
+            [Math.min(window.innerWidth - 36, 336), window.innerHeight - 40],
+            getWiggleRadiiAtT(((t / 1000) % SECONDS_PER_WIGGLE) / SECONDS_PER_WIGGLE),
+            ((t / 1000) % SECONDS_PER_CYCLE) >= SECONDS_PER_WIGGLE
+        );
+        ctx.lineCap = 'round';
+        ctx.lineWidth = 8 / window.devicePixelRatio;
+        ctx.strokeStyle = '#111';
+        ctx.stroke();
+
     } catch(ex) {
         console.error(ex);
     }
