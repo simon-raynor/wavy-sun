@@ -4,6 +4,7 @@ body {
     padding: 0;
 }
 
+
 #stage {
     height: 100dvh;
     width: 100dvw;
@@ -23,4 +24,9 @@ body {
     stroke-linejoin: round;
     stroke: lightgoldenrodyellow;
     stroke-width: 3;
+}
+
+
+canvas {
+    display: block;
 }
