@@ -193,8 +193,8 @@ function loop(t: number) {
         drawSun(
             t / 1000,
             [
-                (window.innerWidth / 10) * Math.sin(t / 5000) + window.innerWidth / 2,
-                (window.innerWidth / 15) * Math.cos(t / 5000) + window.innerHeight / 3
+                (window.innerWidth / 20) * Math.sin(t / 5000) + window.innerWidth / 2,
+                (window.innerWidth / 25) * Math.cos(t / 5000) + window.innerHeight / 3
             ],
             Math.min(window.innerWidth / 2, 2 * window.innerHeight / 3),
             3
