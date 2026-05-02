@@ -77,18 +77,22 @@ function wigglyLine(from: Vec2, to: Vec2, radii: number[], reversed: boolean) {
 
     let cumulativeX = 0;
 
+
+    const wiggleAngle = Math.PI / 7;
+
     radii.forEach((r, i) => {
         const x = r * length / total;
 
         const isOdd = !!(i % 2) !== reversed;
         const startAngle = isOdd
-            ? -5 * Math.PI / 4
-            : -3 * Math.PI / 4;
+            ? - Math.PI - wiggleAngle
+            : wiggleAngle - Math.PI;
         const endAngle = isOdd
-            ? -7 * Math.PI / 4
-            : -1 * Math.PI / 4;
-        const radius = x / Math.SQRT2;
-        const y = isOdd ? -radius / Math.SQRT2 : radius / Math.SQRT2;
+            ? wiggleAngle - (2 * Math.PI)
+            : - wiggleAngle;
+        
+        const radius = (x/2) / Math.cos(wiggleAngle);
+        const y = (isOdd ? -1 : 1) * Math.tan(wiggleAngle) * (x/2);
 
         ctx.arc(cumulativeX + (x / 2), y, radius, startAngle, endAngle, isOdd);
 
